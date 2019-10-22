@@ -3,12 +3,77 @@
   <i><%= @place.address %></i>
   <br/><br/>
   <p><%= @place.description %></p>
-  <div class="float-right">
-    <% if current_user && current_user == @place.user %>
-    <%= link_to 'Edit', edit_place_path(@place), class: 'btn btn-primary' %>
-    <%= link_to 'Destroy', place_path(@place), method: :delete, data: {confirm: 'Are you sure you want to delete this?'}, class: 'btn btn-danger' %>
+
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+
+
+<% if @place.latitude.present? && @place.longitude.present? %>
+
+  <script>
+
+    function initMap() {
+      
+      var myLatLng = {lat: <%= @place.latitude %>, lng: <%= @place.longitude %>};
+
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: myLatLng
+      });
+
+      var marker = new google.maps.Marker({
+        position: myLatLng,
+        map: map,
+        title: 'Hello World!'
+      });
+    }
+
+  </script>
+
+  <script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5EMVSjhlY4BEK0rmEYJpfFb10cx_4kVE&callback=initMap">
+</script>
+
+<div id="map"></div> 
+<% end %> 
+
+<br /> 
+
+
+<div class="float-right">
+  <% if current_user && current_user == @place.user %>
+  <%= link_to 'Edit', edit_place_path(@place), class: 'btn btn-primary' %>
+  <%= link_to 'Destroy', place_path(@place), method: :delete, data: {confirm: 'Are you sure you want to delete this?'}, class: 'btn btn-danger' %>
     <% end %>
   </div>
+  <%= simple_form_for @comment, url: place_comments_path(@place) do |f| %>
+  <%= f.input :message %>
+  <%= f.input :rating, as: :select, collection: Comment::RATINGS %>
+  <%= f.submit "Add a Comment", class: 'btn btn-primary' %>
+<% end %>
 </div>
+
+<h1>Comments</h1>
+
+<% @place.comments.each do |comment| %>
+  <div>
+    <blockquote>
+      <% if comment.humanized_rating.present? %>
+        <b><%= comment.humanized_rating %></b> -
+      <% end %>
+      <%= comment.message %>
+      <small><%= comment.user.email %></small>
+    </blockquote>
+  </div>
+<% end %>
+
 
 
