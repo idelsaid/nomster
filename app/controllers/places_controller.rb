@@ -11,7 +11,6 @@ class PlacesController < ApplicationController
 
 
   def create
-    byebug
     @place = current_user.places.create(place_params)
     if @place.valid?
       redirect_to root_path
@@ -24,6 +23,7 @@ class PlacesController < ApplicationController
     @place = Place.find(params[:id])
     @comment = Comment.new
   end
+
 
   def edit
     @place = Place.find(params[:id])
